@@ -1,6 +1,12 @@
 #!/bin/sh
 set -eu
 [ "$(id -u)" -eq 0 ] || { echo 'Run as root on OpenWrt.' >&2; exit 1; }
+[ -f /etc/openwrt_release ] || { echo 'This installer requires OpenWrt.' >&2; exit 1; }
+[ -f /usr/share/ucode/luci/runtime.uc ] || [ -d /usr/share/ucode/luci/template ] || { echo 'ucode-based LuCI is required.' >&2; exit 1; }
+command -v uci >/dev/null || { echo 'LuCI/UCI is required.' >&2; exit 1; }
+python3 -c 'import sqlite3, urllib.request' 2>/dev/null || { echo 'Install python3-light python3-sqlite3 python3-urllib first.' >&2; exit 1; }
+command -v nft >/dev/null || { echo 'Install nftables first.' >&2; exit 1; }
+command -v ip >/dev/null || { echo 'Install ip-full first.' >&2; exit 1; }
 cd "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 umask 077
 backup="/root/observatory-backup-$(date +%Y%m%d-%H%M%S)-$$"

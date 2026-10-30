@@ -6,7 +6,7 @@
 
 [English](README.en.md) · [Безопасность](SECURITY.md) · [Лицензия](LICENSE)
 
-![Version](https://img.shields.io/badge/version-0.2.0-d5a34c) ![Languages](https://img.shields.io/badge/languages-RU%20%7C%20EN-7d9b65) ![Storage](https://img.shields.io/badge/data-local%20only-334b35)
+![Version](https://img.shields.io/badge/version-0.2.1-d5a34c) ![Languages](https://img.shields.io/badge/languages-RU%20%7C%20EN-7d9b65) ![Storage](https://img.shields.io/badge/data-local%20only-334b35)
 
 ## Возможности
 
@@ -22,6 +22,24 @@
 - Сборщик требует root для собственных nft-счётчиков. Он создаёт отдельную таблицу `inet observatory` со счётчиками, без drop/redirect/mark. Это мониторинг, но не полностью бездействующий процесс.
 
 ## Установка
+
+Через SSH от root скачайте установщик:
+
+```sh
+wget -O /tmp/luci-app-observatory-install.sh https://github.com/vivolabboo-cyber/luci-app-observatory/releases/download/v0.2.1/bootstrap.sh
+```
+
+Просмотрите скрипт, затем запустите:
+
+```sh
+sh /tmp/luci-app-observatory-install.sh --install-deps
+```
+
+Установщик скачивает фиксированную версию по HTTPS и проверяет SHA-256 архива. Контрольная сумма не заменяет подпись: источником доверия остаются GitHub и сам установщик.
+
+`--install-deps` устанавливает зависимости через apk/opkg из настроенных репозиториев прошивки. Сбор и автозапуск остаются выключенными до проверки конфигурации LAN/WAN.
+
+Ручная установка:
 
 Требуются LuCI, rpcd, nftables, ip-full и Python 3 с sqlite3/urllib. Для OpenWrt с APK: `apk add python3-light python3-sqlite3 python3-urllib ip-full nftables rpcd`; на старых версиях — соответствующие пакеты через opkg. Проверяйте имена пакетов своего релиза. Скрипт установки зависимости сам не скачивает.
 

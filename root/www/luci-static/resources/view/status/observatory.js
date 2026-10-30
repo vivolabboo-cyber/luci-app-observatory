@@ -8,7 +8,7 @@ var readReport = rpc.declare({object:'observatory',method:'report',params:['hour
 
 return view.extend({
     render: function() {
-        var frame=E('iframe', {src:L.resource('observatory/index.html')+'?v=0.2.0&lang='+encodeURIComponent(document.documentElement.lang||'en'),title:'Observatory',style:'width:100%;border:0;min-height:1100px;background:transparent;',referrerpolicy:'same-origin'});
+        var frame=E('iframe', {src:L.resource('observatory/index.html')+'?v=0.2.1&lang='+encodeURIComponent(document.documentElement.lang||'en'),title:'Observatory',style:'width:100%;border:0;min-height:1100px;background:transparent;',referrerpolicy:'same-origin'});
         var handler=function(event) {
             if(event.origin!==window.location.origin || event.source!==frame.contentWindow)return;
             var msg=event.data;

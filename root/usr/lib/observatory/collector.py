@@ -15,7 +15,7 @@ import time
 import urllib.request
 import urllib.error
 
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 CONFIG = '/etc/observatory/config.json'
 STOP = False
 

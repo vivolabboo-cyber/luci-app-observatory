@@ -7,6 +7,6 @@ const language=(query.get('lang')||inherited||navigator.language||'en').toLowerC
 document.documentElement.lang=language;
 const t=key=>dictionaries[language][key]??dictionaries.en[key]??key;
 window.ObservatoryI18n=Object.freeze({language,t});
-try{if(parent!==window&&parent.document.documentElement.hasAttribute('data-zona-mode')){document.documentElement.setAttribute('data-observatory-theme','zona');const link=document.createElement('link');link.rel='stylesheet';link.href='zona.css?v=0.2.0';document.head.appendChild(link);}}catch(e){}
+try{if(parent!==window&&parent.document.documentElement.hasAttribute('data-zona-mode')){document.documentElement.setAttribute('data-observatory-theme','zona');const link=document.createElement('link');link.rel='stylesheet';link.href='zona.css?v=0.2.1';document.head.appendChild(link);}}catch(e){}
 document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('[data-i18n]').forEach(e=>{e.textContent=t(e.dataset.i18n)});const select=document.getElementById('language');select.value=language;select.addEventListener('change',()=>{const url=new URL(location.href);url.searchParams.set('lang',select.value);location.replace(url);});});
 })();

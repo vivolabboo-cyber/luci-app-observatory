@@ -18,6 +18,24 @@ The collector needs root to own an `inet observatory` nft counter table. It neve
 
 ## Install
 
+Over SSH as root, download the installer:
+
+```sh
+wget -O /tmp/luci-app-observatory-install.sh https://github.com/vivolabboo-cyber/luci-app-observatory/releases/download/v0.2.1/bootstrap.sh
+```
+
+Review the script, then run:
+
+```sh
+sh /tmp/luci-app-observatory-install.sh --install-deps
+```
+
+The installer downloads a pinned release over HTTPS and checks the archive SHA-256. A checksum is not a signature: you still trust GitHub and the installer.
+
+`--install-deps` installs dependencies with apk/opkg from configured firmware repositories. Collection and autostart remain disabled pending LAN/WAN configuration review.
+
+Manual installation:
+
 Requires LuCI, rpcd, nftables, ip-full and Python 3 with sqlite3/urllib. On APK OpenWrt: `apk add python3-light python3-sqlite3 python3-urllib ip-full nftables rpcd`; use matching opkg packages on older firmware. Verify package names for your release. The installer downloads no dependencies.
 
 Review downloaded sources/release checksums, keep normal router backups and SSH access, then run `sh install.sh`. Overwritten program files are backed up under private `/root/observatory-backup-*`. Review `/etc/observatory/config.json` against `config/config.example.json`, especially LAN/WAN names. Then manually reload rpcd (`/etc/init.d/rpcd reload`, may require signing in again), and start the collector (`/etc/init.d/observatory start`). Starting it explicitly enables collection of local device metadata. Autostart is a separate choice: `/etc/init.d/observatory enable`. Open Status → Observatory.
