@@ -1,0 +1,15 @@
+{
+  "interface": "br-lan",
+  "wan_interface": "eth1",
+  "runtime": "/tmp/observatory",
+  "store": "/tmp/observatory/history",
+  "dns_log": "/tmp/observatory/dns.log",
+  "interval": 5,
+  "flush_seconds": 60,
+  "retention_days": 7,
+  "max_database_mb": 32,
+  "dns_enabled": false,
+  "tachyon_enabled": false,
+  "language": "en",
+  "collect_connection_details": false
+}

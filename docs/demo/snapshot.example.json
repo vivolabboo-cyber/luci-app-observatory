@@ -1,0 +1,681 @@
+{
+  "version": "0.2.0-demo",
+  "time": 1760000000,
+  "started": 1759913600,
+  "period_start": 1759996400,
+  "system": {
+    "hostname": "openwrt-demo",
+    "version": "25.12",
+    "cpu": 12.5,
+    "load": [
+      "0.12",
+      "0.18",
+      "0.15"
+    ],
+    "memory_total": 4294967296,
+    "memory_used": 268435456,
+    "temperature": 42.1,
+    "uptime": 123456,
+    "disk_total": 8589934592,
+    "disk_free": 7516192768,
+    "interfaces": [
+      {
+        "name": "br-lan",
+        "rx": 123456789,
+        "tx": 345678901,
+        "rx_bps": 1234567,
+        "tx_bps": 7654321,
+        "errors": 0,
+        "drops": 0,
+        "speed": "1000",
+        "state": "up"
+      },
+      {
+        "name": "eth1",
+        "rx": 3456789012,
+        "tx": 456789012,
+        "rx_bps": 52345678,
+        "tx_bps": 2234567,
+        "errors": 0,
+        "drops": 0,
+        "speed": "1000",
+        "state": "up"
+      }
+    ]
+  },
+  "devices": [
+    {
+      "id": "02:00:00:00:00:01",
+      "name": "Demo workstation",
+      "ips": [
+        "192.0.2.101"
+      ],
+      "seen": 1760000000,
+      "up": 12345678,
+      "down": 634567890,
+      "active": true
+    },
+    {
+      "id": "02:00:00:00:00:02",
+      "name": "Demo laptop",
+      "ips": [
+        "192.0.2.102"
+      ],
+      "seen": 1760000000,
+      "up": 24691356,
+      "down": 1269135780,
+      "active": true
+    },
+    {
+      "id": "02:00:00:00:00:03",
+      "name": "Demo TV",
+      "ips": [
+        "192.0.2.103"
+      ],
+      "seen": 1760000000,
+      "up": 37037034,
+      "down": 1903703670,
+      "active": true
+    },
+    {
+      "id": "02:00:00:00:00:04",
+      "name": "Demo tablet",
+      "ips": [
+        "192.0.2.104"
+      ],
+      "seen": 1760000000,
+      "up": 49382712,
+      "down": 2538271560,
+      "active": true
+    }
+  ],
+  "sites": [
+    {
+      "device": "02:00:00:00:00:02",
+      "domain": "service1.example.org",
+      "service": "Demo service 1",
+      "route": "vpn",
+      "source": "Synthetic demo",
+      "up": 1134567,
+      "down": 82345678
+    },
+    {
+      "device": "02:00:00:00:00:03",
+      "domain": "service2.example.org",
+      "service": "Demo service 2",
+      "route": "zapret2",
+      "source": "Synthetic demo",
+      "up": 2269134,
+      "down": 164691356
+    },
+    {
+      "device": "02:00:00:00:00:04",
+      "domain": "service3.example.org",
+      "service": "Demo service 3",
+      "route": "unknown",
+      "source": "Synthetic demo",
+      "up": 3403701,
+      "down": 247037034
+    },
+    {
+      "device": "02:00:00:00:00:01",
+      "domain": "service4.example.org",
+      "service": "Demo service 4",
+      "route": "direct",
+      "source": "Synthetic demo",
+      "up": 4538268,
+      "down": 329382712
+    },
+    {
+      "device": "02:00:00:00:00:02",
+      "domain": "service5.example.org",
+      "service": "Demo service 5",
+      "route": "vpn",
+      "source": "Synthetic demo",
+      "up": 5672835,
+      "down": 411728390
+    },
+    {
+      "device": "02:00:00:00:00:03",
+      "domain": "service6.example.org",
+      "service": "Demo service 6",
+      "route": "zapret2",
+      "source": "Synthetic demo",
+      "up": 6807402,
+      "down": 494074068
+    },
+    {
+      "device": "02:00:00:00:00:04",
+      "domain": "service7.example.org",
+      "service": "Demo service 7",
+      "route": "unknown",
+      "source": "Synthetic demo",
+      "up": 7941969,
+      "down": 576419746
+    },
+    {
+      "device": "02:00:00:00:00:01",
+      "domain": "service8.example.org",
+      "service": "Demo service 8",
+      "route": "direct",
+      "source": "Synthetic demo",
+      "up": 9076536,
+      "down": 658765424
+    }
+  ],
+  "flows": [],
+  "events": [
+    {
+      "time": 1759999400,
+      "kind": "demo",
+      "message": "Synthetic event: demo service started."
+    }
+  ],
+  "history": [
+    {
+      "time": 1759996400,
+      "cpu": 10.0,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 30000000.0,
+      "wan_tx_bps": 8000000.0
+    },
+    {
+      "time": 1759996460,
+      "cpu": 13.365883939231587,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 37191383.07906304,
+      "wan_tx_bps": 7866009.467376818
+    },
+    {
+      "time": 1759996520,
+      "cpu": 13.637189707302728,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 42622064.77211845,
+      "wan_tx_bps": 7476006.844729035
+    },
+    {
+      "time": 1759996580,
+      "cpu": 10.56448003223947,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 44962424.799060814,
+      "wan_tx_bps": 6864829.904811993
+    },
+    {
+      "time": 1759996640,
+      "cpu": 6.972790018768287,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 43639461.40238522,
+      "wan_tx_bps": 6087073.263430021
+    },
+    {
+      "time": 1759996700,
+      "cpu": 6.164302901347446,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 38977082.16155934,
+      "wan_tx_bps": 5212211.605003109
+    },
+    {
+      "time": 1759996760,
+      "cpu": 8.882338007204297,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 32116800.120898005,
+      "wan_tx_bps": 4318393.715920739
+    },
+    {
+      "time": 1759996820,
+      "cpu": 12.627946394875156,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 24738251.584655702,
+      "wan_tx_bps": 3485461.686200427
+    },
+    {
+      "time": 1759996880,
+      "cpu": 13.957432986493528,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 18647962.570381075,
+      "wan_tx_bps": 2787818.8533762638
+    },
+    {
+      "time": 1759996940,
+      "cpu": 11.648473940967026,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 15337048.235023545,
+      "wan_tx_bps": 2287783.573948817
+    },
+    {
+      "time": 1759997000,
+      "cpu": 7.823915556442521,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 15616135.880052922,
+      "wan_tx_bps": 2030022.5101986635
+    },
+    {
+      "time": 1759997060,
+      "cpu": 6.000039173797186,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 19416895.116444122,
+      "wan_tx_bps": 2037560.6902734055
+    },
+    {
+      "time": 1759997120,
+      "cpu": 7.853708327998261,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 25808767.52701611,
+      "wan_tx_bps": 2309724.7509975587
+    },
+    {
+      "time": 1759997180,
+      "cpu": 11.680668147306564,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 33226799.82131723,
+      "wan_tx_bps": 2822203.087399579
+    },
+    {
+      "time": 1759997240,
+      "cpu": 13.962429422779481,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 39854798.98078184,
+      "wan_tx_bps": 3529217.535977902
+    },
+    {
+      "time": 1759997300,
+      "cpu": 12.601151360628467,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 44069999.65162108,
+      "wan_tx_bps": 4367612.601707661
+    },
+    {
+      "time": 1759997360,
+      "cpu": 8.848386733339739,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 44840373.69935073,
+      "wan_tx_bps": 5262496.950318339
+    },
+    {
+      "time": 1759997420,
+      "cpu": 6.154410032481772,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 41977306.689352356,
+      "wan_tx_bps": 6133933.22813894
+    },
+    {
+      "time": 1759997480,
+      "cpu": 6.996051012913295,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 36181777.27862635,
+      "wan_tx_bps": 6904078.627827901
+    },
+    {
+      "time": 1759997540,
+      "cpu": 10.59950883865181,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 28872733.19307286,
+      "wan_tx_bps": 7504138.354517479
+    },
+    {
+      "time": 1759997600,
+      "cpu": 13.65178100291051,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 21839683.336659454,
+      "wan_tx_bps": 7880510.859951098
+    },
+    {
+      "time": 1759997660,
+      "cpu": 13.346622554144224,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 16804563.60042495,
+      "wan_tx_bps": 7999575.909150245
+    },
+    {
+      "time": 1759997720,
+      "cpu": 9.964594762838384,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 15000146.901739448,
+      "wan_tx_bps": 7850697.775875589
+    },
+    {
+      "time": 1759997780,
+      "cpu": 6.6151183832993175,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 16868217.379673574,
+      "wan_tx_bps": 7447175.3003760725
+    },
+    {
+      "time": 1759997840,
+      "cpu": 6.377686551973505,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 21951406.229993474,
+      "wan_tx_bps": 6825053.943596765
+    },
+    {
+      "time": 1759997900,
+      "cpu": 9.470592999608908,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 29005171.53973199,
+      "wan_tx_bps": 6039905.953505077
+    },
+    {
+      "time": 1759997960,
+      "cpu": 13.050233801918411,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 36302505.55239961,
+      "wan_tx_bps": 5161866.261687949
+    },
+    {
+      "time": 1759998020,
+      "cpu": 13.825503713618012,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 42056766.39827431,
+      "wan_tx_bps": 4269367.538792626
+    },
+    {
+      "time": 1759998080,
+      "cpu": 11.083623153231477,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 44859110.33542305,
+      "wan_tx_bps": 3442134.0376499435
+    },
+    {
+      "time": 1759998140,
+      "cpu": 7.345464463148129,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 44023425.832870245,
+      "wan_tx_bps": 2754060.0632078038
+    },
+    {
+      "time": 1759998200,
+      "cpu": 6.047873503628553,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 39754317.60235675,
+      "wan_tx_bps": 2266609.2143459693
+    },
+    {
+      "time": 1759998260,
+      "cpu": 8.38384941870774,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 33097012.22906695,
+      "wan_tx_bps": 2023324.02364219
+    },
+    {
+      "time": 1759998320,
+      "cpu": 12.205706724966763,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 25681450.25002402,
+      "wan_tx_bps": 2045936.4326176192
+    },
+    {
+      "time": 1759998380,
+      "cpu": 13.999647440429069,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 19323219.864463154,
+      "wan_tx_bps": 2332426.542123917
+    },
+    {
+      "time": 1759998440,
+      "cpu": 12.116330744480095,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 15579037.621806648,
+      "wan_tx_bps": 2857203.0439183996
+    },
+    {
+      "time": 1759998500,
+      "cpu": 8.287269322015396,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 15365609.917977637,
+      "wan_tx_bps": 3573389.216012022
+    },
+    {
+      "time": 1759998560,
+      "cpu": 6.032884586227537,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 18735191.29842486,
+      "wan_tx_bps": 4417010.28063399
+    },
+    {
+      "time": 1759998620,
+      "cpu": 7.425847466572002,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 24862790.72295581,
+      "wan_tx_bps": 5312708.080597091
+    },
+    {
+      "time": 1759998680,
+      "cpu": 11.185474314837542,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 32248158.144944284,
+      "wan_tx_bps": 6180472.599043672
+    },
+    {
+      "time": 1759998740,
+      "cpu": 13.85518154513635,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 39083098.04579402,
+      "wan_tx_bps": 6942789.0159616275
+    },
+    {
+      "time": 1759998800,
+      "cpu": 12.980452641917395,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 43694178.760914415,
+      "wan_tx_bps": 7531561.876197476
+    },
+    {
+      "time": 1759998860,
+      "cpu": 9.365509324781165,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 44952446.91418199,
+      "wan_tx_bps": 7894197.853659828
+    },
+    {
+      "time": 1759998920,
+      "cpu": 6.333913808337465,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 42549834.578040846,
+      "wan_tx_bps": 7998303.756503014
+    },
+    {
+      "time": 1759998980,
+      "cpu": 6.672901029485606,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 37074585.046412945,
+      "wan_tx_bps": 7834580.114479582
+    },
+    {
+      "time": 1759999040,
+      "cpu": 10.070807700421655,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 29867230.360643942,
+      "wan_tx_bps": 7417651.872921352
+    },
+    {
+      "time": 1759999100,
+      "cpu": 13.403614098136474,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 22692382.313092355,
+      "wan_tx_bps": 6784761.989929676
+    },
+    {
+      "time": 1759999160,
+      "cpu": 13.607153390595236,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 17306693.93737244,
+      "wan_tx_bps": 5992444.633847146
+    },
+    {
+      "time": 1759999220,
+      "cpu": 10.494292490980897,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 15028769.580309056,
+      "wan_tx_bps": 5111475.154372479
+    },
+    {
+      "time": 1759999280,
+      "cpu": 6.926981354705333,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 16416324.569900645,
+      "wan_tx_bps": 4220547.931358738
+    },
+    {
+      "time": 1759999340,
+      "cpu": 6.184989388962112,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 21129637.052023135,
+      "wan_tx_bps": 3399246.8402326466
+    },
+    {
+      "time": 1759999400,
+      "cpu": 8.950500585184285,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 28014723.748533405,
+      "wan_tx_bps": 2720936.261423536
+    },
+    {
+      "time": 1759999460,
+      "cpu": 12.680916703373498,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 35385875.31033252,
+      "wan_tx_bps": 2246207.6587571222
+    },
+    {
+      "time": 1759999520,
+      "cpu": 13.946510368161942,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 41438376.75719404,
+      "wan_tx_bps": 2017467.1244485544
+    },
+    {
+      "time": 1759999580,
+      "cpu": 11.583700600727337,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 44690364.646558754,
+      "wan_tx_bps": 2055147.3691808458
+    },
+    {
+      "time": 1759999640,
+      "cpu": 7.764843804593535,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 44345638.926067546,
+      "wan_tx_bps": 2355882.5289132963
+    },
+    {
+      "time": 1759999700,
+      "cpu": 6.000979306565521,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 40488600.47482647,
+      "wan_tx_bps": 2892808.8274918594
+    },
+    {
+      "time": 1759999760,
+      "cpu": 7.913795991652353,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 34063586.824618034,
+      "wan_tx_bps": 3617964.2377659124
+    },
+    {
+      "time": 1759999820,
+      "cpu": 11.7446590209913,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 26643665.39719805,
+      "wan_tx_bps": 4466572.786630643
+    },
+    {
+      "time": 1759999880,
+      "cpu": 13.97149059233815,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 20045491.736805487,
+      "wan_tx_bps": 5362830.799785422
+    },
+    {
+      "time": 1759999940,
+      "cpu": 12.546952028556552,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 15884528.874855697,
+      "wan_tx_bps": 6226678.218196639
+    },
+    {
+      "time": 1760000000,
+      "cpu": 8.780757515591134,
+      "temperature": 42,
+      "memory_used": 268435456,
+      "wan_rx_bps": 15179525.638607074,
+      "wan_tx_bps": 6980950.12473224
+    }
+  ],
+  "health": {
+    "nft_counters": true,
+    "tachyon_api": false,
+    "conntrack": false,
+    "dns_log": false,
+    "rpc_registered": true,
+    "retention_days": 7,
+    "flush_seconds": 60,
+    "interval": 5,
+    "errors": {},
+    "collector_rss_kb": 16384,
+    "database_bytes": 1048576
+  },
+  "limits": [
+    "Synthetic demonstration only. No real network data."
+  ],
+  "stale": false
+}

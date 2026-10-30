@@ -1,0 +1,9 @@
+#!/bin/sh /etc/rc.common
+# Prepare the private RAM log before dnsmasq starts during boot.
+START=17
+start() {
+    mkdir -p /tmp/observatory
+    chmod 700 /tmp/observatory
+    touch /tmp/observatory/dns.log
+    chmod 600 /tmp/observatory/dns.log
+}

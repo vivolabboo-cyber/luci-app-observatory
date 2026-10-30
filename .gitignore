@@ -1,0 +1,15 @@
+dist/
+__pycache__/
+*.pyc
+*.sqlite*
+*.db
+*.log
+.env*
+*private*key*
+*.pem
+*.key
+backup*/
+runtime/
+config/config.json
+config/config.local.json
+.DS_Store

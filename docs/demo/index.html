@@ -1,0 +1,7 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Observatory · synthetic demo</title><style>html,body{margin:0;background:#111713}iframe{border:0;width:100%;min-height:1100px}header{color:#e6c780;font:14px system-ui;padding:16px 24px;background:#18211a}a{color:#e6c780}</style></head><body><header>DEMO — INVENTED DATA ONLY · <a href="?lang=en">English</a> · <a href="?lang=ru">Русский</a></header><iframe id="demo" title="Synthetic Observatory demo"></iframe><script>
+document.documentElement.setAttribute('data-zona-mode','dark');
+const lang=new URLSearchParams(location.search).get('lang')==='ru'?'ru':'en';document.documentElement.lang=lang;
+const frame=document.getElementById('demo');const data=fetch('snapshot.example.json').then(r=>r.json());
+window.addEventListener('message',async e=>{if(e.origin!==location.origin||e.source!==frame.contentWindow||e.data?.type!=='observatory:request')return;const m=e.data;if(m.method==='height'){frame.style.height=Math.max(600,Math.min(12000,Number(m.height)||600))+'px';return;}if(!['snapshot','report'].includes(m.method))return;const s=await data;const answer=m.method==='snapshot'?s:{since:s.period_start,time:s.time,hours:24,device:'',sites:s.sites,totals:s.devices.map(d=>({device:d.id,up:d.up,down:d.down})),devices:s.devices};frame.contentWindow.postMessage({type:'observatory:response',id:m.id,data:answer},location.origin);});
+frame.src='../../root/www/luci-static/resources/observatory/index.html?lang='+lang;
+</script></body></html>

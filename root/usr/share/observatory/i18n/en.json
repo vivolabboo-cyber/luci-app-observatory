@@ -1,0 +1,18 @@
+{
+  "b_accd672b7bb2": "Unknown",
+  "b_89644c88e7e4": "RPC module is not registered",
+  "b_b32c1f1fdfa9": "Device discovered ",
+  "b_b0d59c462f3a": "Could not add a device counter",
+  "b_aaaf09216bc6": "Counters are unavailable; restarting the service restores the table",
+  "b_c78703912c7a": "DNS log is empty or unavailable",
+  "b_8af881960bfa": "Tachyon metadata is available again",
+  "b_448595ceec1b": "Tachyon metadata unavailable; attribution is limited",
+  "b_2f646cb43f2b": "IP without a domain",
+  "b_52f1ddf8528d": "DNS + IP (estimate)",
+  "b_61c524002564": "Device counters include LAN traffic and overhead, not only Internet traffic.",
+  "b_9c4ba656c7c5": "Domain traffic is an estimate. Short connections between polls may be missed.",
+  "b_cb27d4c283cb": "A DNS query is not a visit. Shared CDNs and ECH may hide the domain.",
+  "b_07e669d94433": "Routes are labeled only when Tachyon metadata is available; other connections are not assumed direct.",
+  "b_2360103281e9": "A name, model or MAC does not identify a person. HTTPS content is not collected.",
+  "b_e2a4fe533dda": "Collector started. Accounting begins when devices are discovered."
+}

@@ -1,0 +1,45 @@
+#!/usr/bin/python3
+"""Read-only rpcd interface. Auth and ACL enforcement remain with LuCI/rpcd."""
+import json
+import os
+import pathlib
+import re
+import sqlite3
+import sys
+import time
+
+def main():
+    if len(sys.argv)>1 and sys.argv[1]=='list':
+        print(json.dumps({'snapshot':{},'report':{'hours':32,'device':''}}));return
+    if len(sys.argv)<3 or sys.argv[1]!='call':sys.exit(1)
+    method=sys.argv[2]
+    if method not in ('snapshot','report'):sys.exit(1)
+    try:
+        config=json.loads(pathlib.Path('/etc/observatory/config.json').read_text())
+        args=json.loads(sys.stdin.read(4096) or '{}')
+        if not isinstance(args,dict):raise ValueError('Invalid arguments')
+        if method=='snapshot':
+            path=pathlib.Path(config['runtime'])/'snapshot.json'
+            if not path.exists():print(json.dumps({'error':'Collector is starting or stopped'}));return
+            data=json.loads(path.read_text())
+            data['stale']=time.time()-data.get('time',0)>30
+            print(json.dumps(data,ensure_ascii=False,separators=(',',':')));return
+        hours=max(1,min(168,int(args.get('hours',24))))
+        device=str(args.get('device',''))
+        if device and not re.fullmatch(r'[0-9a-f]{2}(:[0-9a-f]{2}){5}',device):raise ValueError('Invalid device')
+        since=int(time.time())-hours*3600
+        dbpath=(pathlib.Path(config['store'])/'history.sqlite').resolve()
+        db=sqlite3.connect(dbpath.as_uri()+'?mode=ro',uri=True,timeout=3)
+        where='t>=?';params=[since]
+        if device:where+=' AND device=?';params.append(device)
+        rows=db.execute('SELECT device,domain,service,route,source,SUM(up),SUM(down) FROM usage WHERE '+where+' GROUP BY device,domain,route,source ORDER BY SUM(up)+SUM(down) DESC LIMIT 2000',params)
+        sites=[dict(device=r[0],domain=r[1],service=r[2],route=r[3],source=r[4],up=r[5],down=r[6]) for r in rows]
+        totals=[dict(device=r[0],up=r[1],down=r[2]) for r in db.execute('SELECT device,SUM(up),SUM(down) FROM totals WHERE '+where+' GROUP BY device',params)]
+        known=[dict(id=r[0],name=r[1],ips=json.loads(r[2]),seen=r[3]) for r in db.execute('SELECT id,name,ips,seen FROM devices')]
+        first=db.execute('SELECT MIN(t) FROM metrics').fetchone()[0]
+        print(json.dumps({'since':since,'time':int(time.time()),'hours':hours,'device':device,'sites':sites,'totals':totals,'devices':known,'first_sample':first,'max_rows':2000,'note':'Domain volumes are estimates, not page history. The latest minute may not be saved yet.'},ensure_ascii=False,separators=(',',':')))
+        db.close()
+    except (ValueError,sqlite3.Error,OSError) as exc:
+        print(json.dumps({'error':'Report unavailable; check local collector status'},ensure_ascii=False))
+
+if __name__=='__main__':main()

@@ -1,0 +1,35 @@
+/* Observatory palette for Zona 1.0.1. Pure presentation; no collector changes. */
+:root[data-observatory-theme="zona"]{
+ color-scheme:dark;
+ --bg:#111713;--panel:#1b241d;--text:#dfdfd0;--sub:#aeb9a2;--line:#3d4936;
+ --accent:#dfb15c;--tint:#353322;--vpn:#9ab784;--zap:#e5bc79;
+ --good:#9abb83;--warn:#e2a17b;--unknown:#89927c;
+}
+
+[data-observatory-theme="zona"] .app{border-radius:3px;border-color:var(--line)}
+[data-observatory-theme="zona"] .top{background:linear-gradient(105deg,#242e21,#172019);border-bottom-color:#46513c}
+[data-observatory-theme="zona"] .sidebar{background:#151e17}
+[data-observatory-theme="zona"] .brand{letter-spacing:0}
+[data-observatory-theme="zona"] h1,[data-observatory-theme="zona"] h2,[data-observatory-theme="zona"] .value{font-family:'Segoe UI',sans-serif;font-weight:400;letter-spacing:.2px}
+[data-observatory-theme="zona"] h1{font-size:28px}
+[data-observatory-theme="zona"] h2{font-size:19px}
+[data-observatory-theme="zona"] .value{font-size:32px;color:#e4dfca}
+[data-observatory-theme="zona"] .panel,[data-observatory-theme="zona"] .metric{border-radius:3px;background:linear-gradient(145deg,#222c21,#18221b);border-color:#3d4936}
+[data-observatory-theme="zona"] nav button{border-radius:0;border-left:2px solid transparent}
+[data-observatory-theme="zona"] nav button[aria-pressed=true]{border-left-color:var(--accent);background:linear-gradient(90deg,#443a23,#282e1f);color:#efc474}
+[data-observatory-theme="zona"] select,[data-observatory-theme="zona"] input[type=search],[data-observatory-theme="zona"] button.secondary{border-radius:2px;background:#141e16;border-color:#58644a}
+[data-observatory-theme="zona"] #refresh,[data-observatory-theme="zona"] button.primary{border-radius:3px;background:linear-gradient(#cda14e,#9a7330);border:1px solid #cca04c;color:#12180f;font-weight:600}
+[data-observatory-theme="zona"] .track{background:#10180f;height:4px;border-radius:1px}
+[data-observatory-theme="zona"] .track span{background:linear-gradient(90deg,#ae8540,#e4b96a)}
+[data-observatory-theme="zona"] .chart .line{stroke:var(--accent)}
+[data-observatory-theme="zona"] .chart .secondary-line{stroke:var(--vpn)}
+[data-observatory-theme="zona"] .chart .area{fill:#675124;fill-opacity:.23}
+[data-observatory-theme="zona"] .chart .grid-line{stroke:#3b4633}
+[data-observatory-theme="zona"] .chart text{fill:#acb59d}
+[data-observatory-theme="zona"] .brand-mark{transform:none}
+[data-observatory-theme="zona"] .brand-mark b{border-radius:0;background:var(--accent)}
+[data-observatory-theme="zona"] .tag{border:1px solid #39452f;border-radius:2px}
+[data-observatory-theme="zona"] .link:hover{color:#f2d18d;text-decoration:underline}
+[data-observatory-theme="zona"] .eyebrow{color:#bbad83}
+@media(max-width:440px){[data-observatory-theme="zona"] h1{font-size:24px}[data-observatory-theme="zona"] .value{font-size:27px}}
+@media print{:root[data-observatory-theme="zona"]{color-scheme:light;--bg:#fff;--panel:#fff;--text:#20291d;--sub:#4d5a42;--line:#c4cabd;--accent:#77551b;--tint:#f0eddf;--vpn:#55713d;--zap:#8b6024;--good:#3b6230;--warn:#8d452d;--unknown:#69725e}[data-observatory-theme="zona"] .panel,[data-observatory-theme="zona"] .metric,[data-observatory-theme="zona"] .top{background:#fff}[data-observatory-theme="zona"] .value{color:#20291d}}

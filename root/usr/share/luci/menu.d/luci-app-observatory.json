@@ -1,0 +1,8 @@
+{
+  "admin/status/observatory": {
+    "title": "Observatory",
+    "order": 8,
+    "action": { "type": "view", "path": "status/observatory" },
+    "depends": { "acl": ["luci-app-observatory"] }
+  }
+}
