@@ -6,7 +6,7 @@
 
 [English](README.en.md) · [Безопасность](SECURITY.md) · [Лицензия](LICENSE)
 
-![Version](https://img.shields.io/badge/version-0.2.1-d5a34c) ![Languages](https://img.shields.io/badge/languages-RU%20%7C%20EN-7d9b65) ![Storage](https://img.shields.io/badge/data-local%20only-334b35)
+![Version](https://img.shields.io/badge/version-0.4.0-d5a34c) ![Languages](https://img.shields.io/badge/languages-RU%20%7C%20EN-7d9b65) ![Storage](https://img.shields.io/badge/data-local%20only-334b35)
 
 ## Возможности
 
@@ -26,7 +26,7 @@
 Через SSH от root скачайте установщик:
 
 ```sh
-wget -O /tmp/luci-app-observatory-install.sh https://github.com/vivolabboo-cyber/luci-app-observatory/releases/download/v0.2.1/bootstrap.sh
+wget -O /tmp/luci-app-observatory-install.sh https://github.com/vivolabboo-cyber/luci-app-observatory/releases/download/v0.4.0/bootstrap.sh
 ```
 
 Просмотрите скрипт, затем запустите:
@@ -45,7 +45,7 @@ sh /tmp/luci-app-observatory-install.sh --install-deps
 
 Скачайте исходники/релиз, проверьте SHA256SUMS, скопируйте на роутер и выполните `sh install.sh`. Заменяемые файлы сохраняются в закрытом `/root/observatory-backup-*`. Настройте `/etc/observatory/config.json` по `config/config.example.json`: LAN/WAN-интерфейсы должны соответствовать вашей схеме. Доступную стандартную SSH-сессию сохраняйте открытой.
 
-После проверки настроек вручную выполните `/etc/init.d/rpcd reload` (может потребоваться повторный вход), затем `/etc/init.d/observatory start`. Это явное включение сбора сведений о локальных устройствах. Для желаемого автозапуска: `/etc/init.d/observatory enable`. Панель: **Статус → Observatory**.
+После проверки настроек вручную выполните `/etc/init.d/rpcd restart` (может потребоваться повторный вход), затем `/etc/init.d/observatory start`. Это явное включение сбора сведений о локальных устройствах. Для желаемого автозапуска: `/etc/init.d/observatory enable`. Панель: **Статус → Observatory**.
 
 ## Интеграции — только по выбору
 
@@ -64,3 +64,13 @@ sh /tmp/luci-app-observatory-install.sh --install-deps
 `python3 tools/check.py`, `python3 -m unittest discover -s tests`, `python3 tools/package.py`. Makefile — для OpenWrt SDK. В `docs/demo` только искусственные данные; демонстрация не соединяется с роутером. Публичная версия проверяется локально и не заменяет установленную домашнюю службу при публикации.
 
 `sh uninstall.sh` останавливает службу и удаляет программные файлы, но сохраняет конфигурацию, историю и резервные копии. Возврат файлов: распакуйте нужную копию из `/root/observatory-backup-*`, затем отдельно решите, запускать ли службу. Лицензия Apache-2.0. Независимый аудит не проводился.
+
+## Диагностика устройства (0.4.0)
+
+Во вкладке «Диагностика» выберите устройство, повторите проблемное действие и подождите 15–30 секунд. Фильтры показывают DNS-ответы, соединения без ответных данных, маршрут VPN/Zapret2 и объём передачи. В списке устройств — короткое имя и один IP; накопленные IPv6-адреса доступны отдельно после выбора. Обновление каждые 5 секунд.
+
+Наблюдения хранятся только в RAM: до 1500 записей на всю сеть за последние два часа. Перезапуск сборщика очищает эту историю. Подробности соединений требуют явного `collect_connection_details: true`; метаданные маршрутов — `tachyon_enabled: true` и API Tachyon на loopback; DNS — `dns_enabled: true` и уже настроенный закрытый журнал dnsmasq с идентификаторами запросов. Обычные DNS-журналы без идентификаторов нельзя надёжно сопоставить: отсутствие записи не считается таймаутом.
+
+«Нет ответных данных» — подозрение, а не доказанная блокировка. UDP бывает односторонним, NXDOMAIN может быть штатным ответом, а отсутствие AAAA — нормальным для IPv4-узла. Ответные байты не подтверждают успешный HTTP-запрос или воспроизведение. Полные URL, HTTP-коды и содержимое HTTPS не собираются.
+
+При обновлении остановите только Обсерваторию, выполните установщик, затем перезапустите rpcd для регистрации нового метода и запустите сборщик. Перезапуск rpcd может потребовать повторного входа в LuCI; VPN перезапускать не требуется. Сохраняйте резервную копию программы и базы перед обновлением.

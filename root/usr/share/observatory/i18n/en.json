@@ -14,5 +14,6 @@
   "b_cb27d4c283cb": "A DNS query is not a visit. Shared CDNs and ECH may hide the domain.",
   "b_07e669d94433": "Routes are labeled only when Tachyon metadata is available; other connections are not assumed direct.",
   "b_2360103281e9": "A name, model or MAC does not identify a person. HTTPS content is not collected.",
-  "b_e2a4fe533dda": "Collector started. Accounting begins when devices are discovered."
+  "b_e2a4fe533dda": "Collector started. Accounting begins when devices are discovered.",
+  "b_dce4f467ca16": "Selected node "
 }

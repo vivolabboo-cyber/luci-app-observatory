@@ -1,4 +1,5 @@
-import importlib.util, tempfile, unittest, pathlib
+import importlib.util, tempfile, unittest, pathlib, sys
+sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/"root/usr/lib/observatory"))
 from unittest.mock import patch
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('collector',ROOT/'root/usr/lib/observatory/collector.py')

@@ -33,4 +33,4 @@ if [ ! -e /etc/observatory/config.json ]; then
     chmod 600 /etc/observatory/config.json
 fi
 echo 'Installed but NOT started or enabled. Review config and docs before starting.'
-echo 'rpcd was not restarted. Reload it manually at a convenient time to register the plugin.'
+echo 'rpcd was not restarted. Restart it manually at a convenient time to register the plugin.'

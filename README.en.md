@@ -21,7 +21,7 @@ The collector needs root to own an `inet observatory` nft counter table. It neve
 Over SSH as root, download the installer:
 
 ```sh
-wget -O /tmp/luci-app-observatory-install.sh https://github.com/vivolabboo-cyber/luci-app-observatory/releases/download/v0.2.1/bootstrap.sh
+wget -O /tmp/luci-app-observatory-install.sh https://github.com/vivolabboo-cyber/luci-app-observatory/releases/download/v0.4.0/bootstrap.sh
 ```
 
 Review the script, then run:
@@ -38,7 +38,7 @@ Manual installation:
 
 Requires LuCI, rpcd, nftables, ip-full and Python 3 with sqlite3/urllib. On APK OpenWrt: `apk add python3-light python3-sqlite3 python3-urllib ip-full nftables rpcd`; use matching opkg packages on older firmware. Verify package names for your release. The installer downloads no dependencies.
 
-Review downloaded sources/release checksums, keep normal router backups and SSH access, then run `sh install.sh`. Overwritten program files are backed up under private `/root/observatory-backup-*`. Review `/etc/observatory/config.json` against `config/config.example.json`, especially LAN/WAN names. Then manually reload rpcd (`/etc/init.d/rpcd reload`, may require signing in again), and start the collector (`/etc/init.d/observatory start`). Starting it explicitly enables collection of local device metadata. Autostart is a separate choice: `/etc/init.d/observatory enable`. Open Status → Observatory.
+Review downloaded sources/release checksums, keep normal router backups and SSH access, then run `sh install.sh`. Overwritten program files are backed up under private `/root/observatory-backup-*`. Review `/etc/observatory/config.json` against `config/config.example.json`, especially LAN/WAN names. Then manually reload rpcd (`/etc/init.d/rpcd restart`, may require signing in again), and start the collector (`/etc/init.d/observatory start`). Starting it explicitly enables collection of local device metadata. Autostart is a separate choice: `/etc/init.d/observatory enable`. Open Status → Observatory.
 
 ## Optional attribution
 
@@ -53,3 +53,13 @@ Device counters include LAN traffic and overhead. DNS queries are not visits. HT
 Run `python3 tools/check.py`, `python3 -m unittest discover -s tests`, then `python3 tools/package.py`. The Makefile targets OpenWrt SDK packaging. `docs/demo` uses invented data and never contacts your router. The public revision is locally tested and was not deployed over the original household installation during publication. No independent security audit or large-network performance guarantee.
 
 `sh uninstall.sh` stops/disables the collector and removes program files, retaining configuration, history and backups. Restore overwritten files from the selected backup; decide separately whether to restart collection. Apache-2.0.
+
+## Device diagnostics (0.4.0)
+
+Select a device in Diagnostics, repeat the failing action and wait 15–30 seconds. Inspect DNS replies, connections without reply data, observed VPN/Zapret2 routes and byte counters. Device labels show a short name and one IP; accumulated IPv6 addresses are available separately. Refresh interval: 5 seconds.
+
+Observations are RAM-only: up to 1500 records across the network for the last two hours, cleared on collector restart. Connection details require explicit `collect_connection_details: true`; route metadata requires `tachyon_enabled: true` and a loopback Tachyon API. DNS requires `dns_enabled: true` and an existing private dnsmasq log with query identifiers. Logs without identifiers cannot be reliably correlated; missing replies are not confirmed DNS timeouts.
+
+No reply data is a suspicion, not proof of blocking. UDP can be one-way, NXDOMAIN can be normal, and a missing AAAA record is not necessarily a fault. Reply bytes do not confirm a successful HTTP request or media playback. Full URLs, HTTP codes and HTTPS contents are not collected.
+
+For upgrades, stop Observatory, run the installer, restart rpcd to register the new method, then start the collector. Restarting rpcd may require signing back into LuCI; VPN services do not need restarting. Back up program files and the database first.

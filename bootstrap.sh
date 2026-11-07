@@ -1,9 +1,9 @@
 #!/bin/sh
 # Download and review this script before running it as root.
 set -eu
-VERSION='0.2.1'
+VERSION='0.4.0'
 PROJECT='luci-app-observatory'
-SHA256='ee1668b2e89d927c01e441cfa7f106d59cfb318d9ac04f99782fe9e35d7e7ac9'
+SHA256='f7e596b08b01da18d743c7e0b3574a6a0319e9e75bb1cbadd2e9195b7218f750'
 activate=0
 deps=0
 for arg in "$@"; do

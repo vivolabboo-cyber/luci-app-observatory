@@ -1,6 +1,6 @@
 include $(TOPDIR)/rules.mk
 PKG_NAME:=luci-app-observatory
-PKG_VERSION:=0.2.1
+PKG_VERSION:=0.4.0
 PKG_RELEASE:=1
 PKG_LICENSE:=Apache-2.0
 PKGARCH:=all

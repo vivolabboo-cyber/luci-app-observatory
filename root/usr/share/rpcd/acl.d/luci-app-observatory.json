@@ -1,6 +1,14 @@
 {
   "luci-app-observatory": {
     "description": "Read local network monitoring statistics",
-    "read": { "ubus": { "observatory": ["snapshot", "report"] } }
+    "read": {
+      "ubus": {
+        "observatory": [
+          "snapshot",
+          "report",
+          "diagnostics"
+        ]
+      }
+    }
   }
 }

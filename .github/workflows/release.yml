@@ -1,0 +1,39 @@
+name: Validate and publish release
+on:
+  push:
+    branches: [main]
+    paths: [VERSION]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: observatory-release
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate sources and privacy defaults
+        run: |
+          python3 tools/check.py
+          python3 -m unittest discover -s tests -v
+          node tests/test_diagnostics_ui.cjs
+          find root -name '*.js' -exec node --check '{}' ';'
+      - name: Build reproducible archive and verify installer checksum
+        run: |
+          python3 tools/package.py
+          python3 tools/verify_release.py
+      - name: Publish versioned archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(cat VERSION)
+          gh release create "v$version" "dist/luci-app-observatory-$version.tar.gz" dist/SHA256SUMS bootstrap.sh --target "$GITHUB_SHA" --title "Observatory $version" --notes-file docs/release-notes.md

@@ -1,0 +1,8 @@
+.diag-filters{display:flex;gap:16px;flex-wrap:wrap;align-items:end}.diag-filters label{display:flex;flex-direction:column;gap:6px;flex:1;min-width:180px}.diag-filters input,.diag-filters select{width:100%;min-height:38px;box-sizing:border-box}.diag-status{font-weight:600}.diag-warning{color:var(--warning,#e9b85f)}.diag-good{color:var(--success,#8eb878)}.diag-explanation{max-width:360px;line-height:1.5;margin-top:5px}.diag-table td{vertical-align:top}.diag-table strong{overflow-wrap:anywhere}.diag-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}.diag-group{display:flex;gap:8px;flex-wrap:wrap;padding:12px;border:1px solid var(--border-color,#52634c);border-radius:6px}.diag-group strong{width:100%;overflow-wrap:anywhere}.diag-intro p{line-height:1.6}@media(max-width:680px){.diag-filters label{min-width:100%}.diag-table{min-width:760px}}
+
+/* Keep native dropdown labels compact; history remains below the filter. */
+.diag-filters label{min-width:0;flex-basis:220px;max-width:100%}
+.diag-filters select,.diag-filters input{min-width:0;max-width:100%;text-overflow:ellipsis}
+.diag-addresses{margin-top:12px}.diag-addresses summary{cursor:pointer}
+.diag-addresses>div{display:flex;flex-wrap:wrap;gap:6px;max-height:160px;overflow:auto;margin-top:8px}
+.diag-addresses code{white-space:normal;overflow-wrap:anywhere;padding:3px 6px;font-size:12px}

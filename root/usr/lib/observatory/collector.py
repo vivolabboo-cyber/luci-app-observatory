@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Local monitoring with counter-only nft chains; requires root. No cloud uploads."""
+"""Local, read-only monitoring. Own nft chains count packets but never change verdicts."""
 import collections
 import datetime
 import ipaddress
@@ -14,10 +14,14 @@ import sys
 import time
 import urllib.request
 import urllib.error
+from analytics import migrate
+from diagnostics import Diagnostics
 
-VERSION = '0.2.1'
-CONFIG = '/etc/observatory/config.json'
-STOP = False
+VERSION = '0.4.0'
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self,req,fp,code,msg,headers,newurl):
+        raise urllib.error.HTTPError(req.full_url,code,'Redirect rejected',headers,fp)
 
 LANGUAGE = 'en'
 _MESSAGES = None
@@ -29,6 +33,9 @@ def message(key):
         except (OSError,ValueError):_MESSAGES={}
     return _MESSAGES.get(key,key)
 
+
+CONFIG = '/etc/observatory/config.json'
+STOP = False
 
 def command(args, timeout=5):
     return subprocess.check_output(args, timeout=timeout, stderr=subprocess.DEVNULL).decode(errors='replace')
@@ -105,11 +112,6 @@ def load_device_totals(db, since):
     return {device:[up or 0,down or 0] for device,up,down in db.execute(
         'SELECT device,SUM(up),SUM(down) FROM totals WHERE t>=? GROUP BY device',(since,))}
 
-class NoRedirect(urllib.request.HTTPRedirectHandler):
-    """Local API endpoints must never redirect requests (including auth headers)."""
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        raise urllib.error.HTTPError(req.full_url, code, 'Redirect rejected', headers, fp)
-
 class Monitor:
     def __init__(self, config):
         self.cfg=config
@@ -128,6 +130,15 @@ class Monitor:
         CREATE TABLE IF NOT EXISTS events(t INTEGER, kind TEXT, message TEXT);
         CREATE INDEX IF NOT EXISTS usage_t ON usage(t);
         ''')
+        migrate(self.db)
+        try:self.timezone=command(["uci","-q","get","system.@system[0].zonename"]).strip() or "UTC"
+        except (OSError,subprocess.SubprocessError):self.timezone="UTC"
+        self.diagnostics=Diagnostics(self.runtime)
+        self.pending_dns=[]; self.dns_dropped=0; self.selector_previous={}; self.last_selector_check=0
+        self.api_down_since=None
+        try:
+            self.local_api_addresses={str(a['local']) for interface in json.loads(command(['ip','-j','address','show'])) for a in interface.get('addr_info',[]) if a.get('local')}
+        except (OSError,ValueError,subprocess.SubprocessError):self.local_api_addresses=set()
         self.db.commit()
         self.started=int(time.time()); self.last_flush=time.time(); self.last_metric=0; self.last_discovery=0; self.last_maintenance=0
         self.devices={}; self.ip_device={}; self.counter_ips=set(); self.counters={}; self.device_totals=collections.defaultdict(lambda:[0,0])
@@ -162,11 +173,14 @@ class Monitor:
             self.errors.pop('rpc',None)
             return
         self.errors['rpc']=message('b_89644c88e7e4')
-        return  # Report only; never reload or restart rpcd automatically.
+        # A missing RPC plugin is reported; no router service is restarted automatically.
 
-    def event(self, kind, msg):
-        item={'time':int(time.time()),'kind':kind,'message':msg};self.events.appendleft(item)
-        self.db.execute('INSERT INTO events VALUES(?,?,?)',(item['time'],kind,msg))
+    def event(self, kind, msg, device='', domain='', level='info', details=None):
+        details=details or {'type':kind}
+        item={'time':int(time.time()),'kind':kind,'message':msg,'device':device,'domain':domain,'level':level,'details':details}
+        self.events.appendleft(item)
+        self.db.execute('INSERT INTO events(t,kind,message,device,domain,level,details) VALUES(?,?,?,?,?,?,?)',
+                        (item['time'],kind,msg,device,domain,level,json.dumps(details,ensure_ascii=False)))
 
     def setup_nft(self):
         try:
@@ -191,7 +205,7 @@ class Monitor:
                     found[ip]=(mac,found.get(ip,('', ''))[1])
         except (OSError,ValueError,subprocess.SubprocessError):pass
         for ip,(mac,name) in found.items():
-            if mac not in self.devices:self.event('device',message('b_b32c1f1fdfa9')+(name or mac)+' ('+ip+')')
+            if mac not in self.devices:self.event('device',message('b_b32c1f1fdfa9')+(name or mac)+' ('+ip+')',device=mac)
             obj=self.devices.setdefault(mac,{'id':mac,'name':name or mac,'ips':[],'seen':now})
             if name:obj['name']=name
             if ip not in obj['ips']:obj['ips'].append(ip)
@@ -234,16 +248,24 @@ class Monitor:
             self.nft_ok=False;self.errors['counters']=message('b_aaaf09216bc6')
 
     def parse_dns(self, line, now):
-        query=re.search(r'query\[[^]]+\]\s+(\S+)\s+from\s+(\S+)',line)
+        self.diagnostics.dns(line,now,self.ip_device)
+        query=re.search(r'query\[([^]]+)\]\s+(\S+)\s+from\s+(\S+)',line)
         if query:
-            domain=hostname(query[1]);ip=query[2]
-            if domain and ip in self.ip_device:self.queries[domain]=(self.ip_device[ip],now)
+            domain=hostname(query[2]);ip=query[3]
+            if domain and ip in self.ip_device:
+                dev=self.ip_device[ip]
+                previous=self.queries.get(domain)
+                # A shared DNS answer cannot safely be assigned to the last client.
+                ambiguous=previous is not None and now-previous[1]<15 and previous[0]!=dev
+                self.queries[domain]=('' if ambiguous else dev,now)
+                if len(self.pending_dns)<10000:self.pending_dns.append((now,dev,domain,str(query[1])[:16]))
+                else:self.dns_dropped+=1
         answer=re.search(r'(?:reply|cached)\s+(\S+)\s+is\s+(\S+)',line)
         if answer:
             domain=hostname(answer[1]);ip=answer[2]
             if domain in self.queries and address(ip):
                 dev,t=self.queries[domain]
-                if now-t<15:self.dns_ips[(dev,ip)][domain]=now
+                if dev and now-t<15:self.dns_ips[(dev,ip)][domain]=now
 
     def sample_dns(self):
         if not self.cfg.get("dns_enabled",False):return
@@ -279,8 +301,7 @@ class Monitor:
             host,port=controller.rsplit(':',1); host=host.strip('[]')
             ip=address(host)
             if not ip or not (ip.is_loopback or ip.is_unspecified) or not 1<=int(port)<=65535:return []
-            if host=='0.0.0.0':host='127.0.0.1'
-            if host=='::':host='::1'
+            if ip.is_unspecified:host='::1' if ip.version==6 else '127.0.0.1'
             if ':' in host:host='['+host+']'
             headers={}
             if api.get('secret'):headers['Authorization']='Bearer '+api['secret']
@@ -288,9 +309,31 @@ class Monitor:
             req=urllib.request.Request(f'http://{host}:{port}/connections',headers=headers)
             with opener.open(req,timeout=2) as response:
                 payload=json.loads(response.read(4*1024*1024))
-            self.clash_ok=True;return payload.get('connections',[])[:3000]
+            self.clash_ok=True
+            self.observe_selectors(opener,f'http://{host}:{port}',headers,cfg)
+            return payload.get('connections',[])[:3000]
         except (OSError,ValueError,KeyError):
             self.clash_ok=False;return []
+
+    def observe_selectors(self,opener,base,headers,cfg):
+        if time.time()-self.last_selector_check<30:return
+        self.last_selector_check=time.time()
+        tags={x.get('tag') for x in cfg.get('outbounds',[]) if x.get('type')=='selector'}
+        if not tags:return
+        try:
+            req=urllib.request.Request(base+'/proxies',headers=headers)
+            with opener.open(req,timeout=1) as response:proxies=json.loads(response.read(4*1024*1024)).get('proxies',{})
+            for tag in sorted(tags):
+                active=str(proxies.get(tag,{}).get('now') or '')
+                if not active:continue
+                old=self.selector_previous.get(tag)
+                if old and old!=active:
+                    self.event('vpn_switch',message('b_dce4f467ca16')+str(tag)+': '+old+' → '+active,
+                               details={'group':tag,'from':old,'to':active,'meaning':'selector_state','sample_seconds':30})
+                self.selector_previous[tag]=active
+        except (OSError,ValueError,KeyError,TypeError):
+            # Optional selector telemetry must not affect connection collection.
+            pass
 
     def observe(self,key,dev,domain,route,source,up,down,proto,dst,port):
         now=int(time.time());prev=self.observed.get(key)
@@ -301,21 +344,24 @@ class Monitor:
         if domain and route!='unknown':
             route_key=(dev,domain)
             old=self.route_previous.get(route_key)
-            if old and old!=route:self.event('route',self.devices.get(dev,{}).get('name',dev)+': '+domain+' — '+old+' → '+route)
+            if old and old!=route:self.event('route_observation',self.devices.get(dev,{}).get('name',dev)+': '+domain+' — '+old+' → '+route,device=dev,domain=domain,details={'from':old,'to':route,'meaning':'observed_connections'})
             if len(self.route_previous)<5000:self.route_previous[route_key]=route
         if delta_u or delta_d:
             record=(now//60*60,dev,domain,service(domain),route,source)
             self.pending_usage[record][0]+=delta_u;self.pending_usage[record][1]+=delta_d
         self.flow_rows.append({'device':dev,'domain':domain,'service':service(domain),'destination':dst,'port':str(port),'protocol':proto,
-                               'route':route,'source':source,'up':up,'down':down,'seen':now})
+                               'route':route,'source':source,'up':up,'down':down,'seen':now,'diag_id':key})
 
     def sample_flows(self):
         if not self.cfg.get("collect_connection_details",False):
-            self.flow_rows=[]; self.active=0; return
+            self.flow_rows=[];self.active=0;return
         self.flow_rows=[];seen_tuples=set()
         connections=self.clash_connections()
         if self.api_previous is not None and self.api_previous!=self.clash_ok:
-            self.event('tachyon',message('b_8af881960bfa') if self.clash_ok else message('b_448595ceec1b'))
+            duration=int(time.time()-self.api_down_since) if self.clash_ok and self.api_down_since else None
+            self.event('tachyon',message('b_8af881960bfa') if self.clash_ok else message('b_448595ceec1b'),level='info' if self.clash_ok else 'warning',details={'state':'up' if self.clash_ok else 'down','duration_seconds':duration})
+            self.api_down_since=None if self.clash_ok else time.time()
+        if self.api_previous is None and not self.clash_ok:self.api_down_since=time.time()
         self.api_previous=self.clash_ok
         for item in connections:
             meta=item.get('metadata',{});ip=str(meta.get('sourceIP',''));dev=self.ip_device.get(ip)
@@ -338,6 +384,7 @@ class Monitor:
             key='ct:'+':'.join([row['src'],row['sport'],row['dst'],row['port'],row['protocol']])
             self.observe(key,dev,domain,'unknown',message('b_52f1ddf8528d') if domain else message('b_2f646cb43f2b'),row['up'],row['down'],row['protocol'],row['dst'],row['port'])
         now=time.time();self.observed={k:v for k,v in self.observed.items() if now-v[2]<60}
+        self.diagnostics.observe_flows(self.flow_rows,int(time.time()))
         self.flow_rows.sort(key=lambda r:r['down']+r['up'],reverse=True)
         self.active=len(self.flow_rows);self.flow_rows=self.flow_rows[:200]
 
@@ -350,7 +397,7 @@ class Monitor:
         self.last_cpu=(total,idle)
         mem={k:int(v.split()[0])*1024 for k,v in (line.split(':',1) for line in read('/proc/meminfo').splitlines())}
         disk=os.statvfs('/'); interfaces=[]
-        for name in dict.fromkeys([self.interface,self.cfg.get('wan_interface','eth1')]):
+        for name in [self.interface,'eth0','eth1']:
             base='/sys/class/net/'+name+'/';rx=int(read(base+'statistics/rx_bytes','0'));tx=int(read(base+'statistics/tx_bytes','0'))
             prev=self.net_prev.get(name);dt=max(.1,now-prev[2]) if prev else 1
             interfaces.append({'name':name,'rx':rx,'tx':tx,'rx_bps':max(0,rx-prev[0])/dt if prev else 0,'tx_bps':max(0,tx-prev[1])/dt if prev else 0,
@@ -372,6 +419,10 @@ class Monitor:
         return result
 
     def flush(self):
+        self.db.executemany('INSERT INTO dns_queries VALUES(?,?,?,?)',self.pending_dns)
+        self.db.execute('DELETE FROM dns_queries WHERE t<?',(int(time.time())-2*86400,))
+        self.db.execute('DELETE FROM dns_queries WHERE rowid IN (SELECT rowid FROM dns_queries ORDER BY t DESC,rowid DESC LIMIT -1 OFFSET 100000)')
+        self.pending_dns.clear()
         for (t,dev),values in self.pending_totals.items():
             self.db.execute('INSERT INTO totals VALUES(?,?,?,?) ON CONFLICT(t,device) DO UPDATE SET up=up+excluded.up,down=down+excluded.down',(t,dev,*values))
         for (t,dev,domain,label,route,source),values in self.pending_usage.items():
@@ -381,12 +432,12 @@ class Monitor:
         self.db.commit();self.pending_totals.clear();self.pending_usage.clear();self.last_flush=time.time()
         if time.time()-self.last_maintenance>3600:
             cutoff=int(time.time())-self.cfg['retention_days']*86400
-            for table in ['usage','totals','metrics','events']:self.db.execute('DELETE FROM '+table+' WHERE t<?',(cutoff,))
+            for table in ['usage','totals','metrics','events','dns_queries']:self.db.execute('DELETE FROM '+table+' WHERE t<?',(cutoff,))
             if (self.store/'history.sqlite').stat().st_size>self.cfg['max_database_mb']*1024*1024:
                 # Bounded oldest-day eviction; vacuum hourly only after the cap is reached.
                 oldest=self.db.execute('SELECT MIN(t) FROM metrics').fetchone()[0]
                 if oldest:
-                    for table in ['usage','totals','metrics','events']:self.db.execute('DELETE FROM '+table+' WHERE t<?',(oldest+86400,))
+                    for table in ['usage','totals','metrics','events','dns_queries']:self.db.execute('DELETE FROM '+table+' WHERE t<?',(oldest+86400,))
                 self.db.commit();self.db.execute('VACUUM')
             self.db.commit();self.last_maintenance=time.time()
 
@@ -408,11 +459,11 @@ class Monitor:
             metric=json.loads(data);wan=next((i for i in metric.get('interfaces',[]) if i['name']==self.cfg.get('wan_interface','eth1')),{})
             history.append({'time':t,'cpu':metric['cpu'],'temperature':metric['temperature'],'memory_used':metric['memory_used'],
                             'wan_rx_bps':wan.get('rx_bps',0),'wan_tx_bps':wan.get('tx_bps',0)})
-        payload={'version':VERSION,'time':int(time.time()),'started':self.started,'period_start':max(since,self.started),'system':self.last_system,
+        payload={'version':VERSION,'timezone':self.timezone,'time':int(time.time()),'started':self.started,'period_start':max(since,self.started),'system':self.last_system,
                  'devices':devices,'sites':sites[:500],'flows':self.flow_rows,'events':list(self.events),'history':history[-1440:],
-                 'health':{'nft_counters':self.nft_ok,'tachyon_api':self.clash_ok,'conntrack':self.conntrack_ok,'dns_log':bool(self.cfg.get('dns_enabled')) and pathlib.Path(self.cfg['dns_log']).exists(),
+                 'health':{'nft_counters':self.nft_ok,'tachyon_api':self.clash_ok,'conntrack':self.conntrack_ok,'dns_log':bool(self.cfg.get('dns_enabled',False)) and pathlib.Path(self.cfg['dns_log']).exists(),
                            'rpc_registered':self.rpc_registered,
-                           'retention_days':self.cfg['retention_days'],'flush_seconds':self.cfg['flush_seconds'],'interval':self.cfg['interval'],'errors':self.errors,
+                           'dns_retention_days':2,'dns_max_rows':100000,'dns_dropped':self.dns_dropped,'max_database_mb':self.cfg['max_database_mb'],'retention_days':self.cfg['retention_days'],'flush_seconds':self.cfg['flush_seconds'],'interval':self.cfg['interval'],'errors':self.errors,
                            'collector_rss_kb':next((int(x.split()[1]) for x in read('/proc/self/status').splitlines() if x.startswith('VmRSS:')),0),
                            'database_bytes':(self.store/'history.sqlite').stat().st_size},
                  'limits':[message('b_61c524002564'),
@@ -421,6 +472,8 @@ class Monitor:
                            message('b_07e669d94433'),
                            message('b_2360103281e9')]}
         atomic_json(self.runtime/'snapshot.json',payload)
+        try:self.diagnostics.snapshot(int(time.time()),{'tachyon_api':self.clash_ok,'dns_log':bool(self.cfg.get('dns_enabled',False)) and pathlib.Path(self.cfg['dns_log']).exists(),'conntrack':self.conntrack_ok})
+        except OSError:self.errors['diagnostics']='Cannot write diagnostics snapshot'
 
     def loop(self):
         self.event('startup',message('b_e2a4fe533dda'))
